@@ -1,0 +1,68 @@
+server:
+  port: 8888
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # Auth Service Route
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+        - id: auth-service-docs
+          uri: lb://auth-service
+          predicates:
+            - Path=/v3/api-docs/auth-service
+          filters:
+            - RewritePath=/v3/api-docs/auth-service, /v3/api-docs
+
+        # Student Service Routes
+        - id: student-service
+          uri: lb://student-service
+          predicates:
+            - Path=/students/**
+        - id: student-service-docs
+          uri: lb://student-service
+          predicates:
+            - Path=/v3/api-docs/student-service
+          filters:
+            - RewritePath=/v3/api-docs/student-service, /v3/api-docs
+
+        # Course Service Routes
+        - id: course-service
+          uri: lb://course-service
+          predicates:
+            - Path=/courses/**
+        - id: course-service-docs
+          uri: lb://course-service
+          predicates:
+            - Path=/v3/api-docs/course-service
+          filters:
+            - RewritePath=/v3/api-docs/course-service, /v3/api-docs
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: auth-service
+        url: /v3/api-docs/auth-service
+      - name: student-service
+        url: /v3/api-docs/student-service
+      - name: course-service
+        url: /v3/api-docs/course-service
